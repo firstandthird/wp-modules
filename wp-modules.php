@@ -69,7 +69,7 @@ class ftModules {
   }
 
   function render_module($module, $data = array()) {
-    $module_split = split('/', $module);
+    $module_split = explode('/', $module);
     $data_key = $module;
     $config_data = array();
 
