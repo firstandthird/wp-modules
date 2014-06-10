@@ -31,7 +31,7 @@ class ftModules {
     add_action('ft_modules_path', array($this, 'set_path'));
     add_action('ft_modules_suffix', array($this, 'set_suffix'));
 
-    add_action('ft_modules_render', array($this, 'render_module'), 2);
+    add_action('ft_modules_render', array($this, 'render_module'), 10, 2);
   }
 
   private function load_data() {
@@ -95,7 +95,7 @@ class ftModules {
       }
     }
 
-    echo $this->handlebars->render($this->cache[$module_loc], array_merge($config_data, $data));
+    echo $this->handlebars->render($this->cache[$module_loc], array_replace_recursive($config_data, $data));
   }
 }
 
