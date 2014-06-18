@@ -25,25 +25,29 @@ class ftModules {
     // Adds this suffix to module directories
     $this->module_suffix = '-modules';
 
-    $this->load_data();
-
     // Allow theme to override module path and suffix
     add_action('ft_modules_path', array($this, 'set_path'));
     add_action('ft_modules_suffix', array($this, 'set_suffix'));
 
+    add_action('init', array($this, 'load_data'), 20);
+
     add_action('ft_modules_render', array($this, 'render_module'), 10, 2);
   }
 
-  private function load_data() {
+  function load_data() {
     if(!file_exists($this->module_path)) {
       return false;
     }
 
-    foreach (glob($this->module_path . "/*/data.yaml") as $filename) {
+    $dir_iterator = new RecursiveDirectoryIterator($this->module_path);
+    $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+
+    foreach($iterator as $file) {
+      if(!$file->isFile() || $file->getFilename() !== 'data.yaml') continue;
+
       $config = array();
 
-      $config = spyc_load_file($filename);
-
+      $config = spyc_load_file($file->getRealPath());
       if(!is_array($config)) continue;
 
       $this->config = array_merge($this->config, $config);
@@ -75,7 +79,7 @@ class ftModules {
 
     if(count($module_split) > 1) {
       $module_split[0] .= $this->module_suffix;
-      $data_key = $module_split[1];
+      $data_key = $module_split[count($module_split) -1];
     }
 
     $module = join('/', $module_split);
