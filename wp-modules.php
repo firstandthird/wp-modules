@@ -20,6 +20,39 @@ class ftModules {
   function __construct() {
     $this->handlebars = new Handlebars;
 
+    // is helper mimics ui-guide is helper
+    $this->handlebars->addHelper('is', function($template, $context, $arg) {
+      $args = (array) explode(' ', $arg);
+      $val = $args[0];
+      $tmp = true;
+
+      if(!is_numeric($val)) {
+        $val = $context->get($val);
+      }
+
+      if(count($args) > 1) {
+        $tmp = $args[1];
+
+        if(!is_numeric($tmp)) {
+          $tmp = $context->get($tmp);
+        }
+      }
+
+      if($val == $tmp) {
+        $template->setStopToken('else');
+        $buffer = $template->render($context);
+        $template->setStopToken(false);
+        $template->discard($context);
+      } else {
+        $template->setStopToken('else');
+        $template->discard($context);
+        $template->setStopToken(false);
+        $buffer = $template->render($context);
+      }
+
+      return $buffer;
+    });
+
     $this->module_path = ABSPATH . 'styleguide/modules/';
 
     // Adds this suffix to module directories
